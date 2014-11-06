@@ -34,6 +34,7 @@ module.exports = (robot) ->
         console.log "verified with Crashlytics"
 
       if data.event == 'issue_impact_change'
+        console.log 'Got a crash from Crashlytics'
         robot.messageRoom '#publishmobileautomati', 'Stuffs broke!'
         res.writeHead 204, { 'Content-Length': 0}
 
