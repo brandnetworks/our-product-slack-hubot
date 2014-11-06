@@ -22,7 +22,7 @@ querystring = require('querystring')
 
 module.exports = (robot) ->
 
-  robot.router.post "/hubot/crashltics-notify", (req, res) ->
+  robot.router.post "/hubot/crashlytics-notify", (req, res) ->
 
     @failing ||= []
     query = querystring.parse(url.parse(req.url).query)
