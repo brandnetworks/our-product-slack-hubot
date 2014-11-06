@@ -29,8 +29,6 @@ module.exports = (robot) ->
 
     res.end('')
 
-    envelope.room = query.room if query.room
-
     try
       data = req.body
 
