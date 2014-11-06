@@ -35,6 +35,7 @@ module.exports = (robot) ->
       data = req.body
 
       if data.event == 'verification'
+        console.log "verified with Crashlytics"
         res.writeHead 204, { 'Content-Length': 0}
         res.end()
 
