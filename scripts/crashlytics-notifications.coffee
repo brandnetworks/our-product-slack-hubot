@@ -27,19 +27,17 @@ module.exports = (robot) ->
     @failing ||= []
     query = querystring.parse(url.parse(req.url).query)
 
-    res.end('')
-
     try
       data = req.body
 
       if data.event == 'verification'
         console.log "verified with Crashlytics"
-        res.writeHead 204, { 'Content-Length': 0}
-        res.end()
 
       if data.event == 'issue_impact_change'
         robot.messageRoom '#publishmobileautomati', 'Stuffs broke!'
+        res.writeHead 204, { 'Content-Length': 0}
 
+      res.end()
     catch error
       console.log "jenkins-notify error: #{error}. Data: #{req.body}"
       console.log error.stack
