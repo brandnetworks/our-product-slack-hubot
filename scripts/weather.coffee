@@ -1,99 +1,58 @@
-# Description:
-#   Returns weather information from Forecast.io with a sprinkling of Google maps.
+# Description
+#   Grabs the current forecast from Dark Sky
 #
-# Configuration:
-#   HUBOT_WEATHER_CELSIUS - Display in celsius
-#   HUBOT_FORECAST_API_KEY - Forecast.io API Key
+# Dependencies
+#   None
+#
+# Configuration
+#   HUBOT_DARK_SKY_API_KEY
+#   HUBOT_DARK_SKY_DEFAULT_LOCATION
+#   HUBOT_DARK_SKY_UNITS (optional - us, si, ca, or uk)
 #
 # Commands:
-#   hubot weather <city> - Get the weather for a location.
-#   hubot forecast <city> - Get the 3 day forecast for a location.
-#   hubot forecast - Get the 3 day forecast for a location.
+#   hubot weather - Get the weather for HUBOT_DARK_SKY_DEFAULT_LOCATION
+#   hubot weather <location> - Get the weather for <location>
+#
+# Notes:
+#   If HUBOT_DARK_SKY_DEFAULT_LOCATION is blank, weather commands without a location will be ignored
 #
 # Author:
-#   markstory
-#   mbmccormick
-#   bmnick
-env = process.env
-
-forecastIoUrl = 'https://api.forecast.io/forecast/' + process.env.HUBOT_FORECAST_API_KEY + '/'
-googleMapUrl = 'http://maps.googleapis.com/maps/api/geocode/json'
-
-lookupAddress = (msg, location, cb) ->
-  msg.http(googleMapUrl).query(address: location, sensor: true)
-    .get() (err, res, body) ->
-      try
-        body = JSON.parse body
-        coords = body.results[0].geometry.location
-      catch err
-        err = "Could not find #{location}"
-        return cb(msg, null, err)
-      cb(msg, coords, err)
-
-lookupWeather = (msg, coords, err) ->
-  return msg.send err if err
-  return msg.send "You need to set env.HUBOT_FORECAST_API_KEY to get weather data" if not env.HUBOT_FORECAST_API_KEY
-
-  url = forecastIoUrl + coords.lat + ',' + coords.lng
-
-  msg.http(url).query(units: 'ca').get() (err, res, body) ->
-    return msg.send 'Could not get weather data' if err
-    try
-      body = JSON.parse body
-      current = body.currently
-    catch err
-      return msg.send "Could not parse weather data."
-    humidity = (current.humidity * 100).toFixed 0
-    temperature = getTemp(current.temperature)
-    text = "It is currently #{temperature} #{current.summary}, #{humidity}% humidity"
-    msg.send text
-
-lookupForecast = (msg, coords, err) ->
-  return msg.send err if err
-  return msg.send "You need to set env.HUBOT_FORECAST_API_KEY to get weather data" if not env.HUBOT_FORECAST_API_KEY
-
-  url = forecastIoUrl + coords.lat + ',' + coords.lng
-  msg.http(url).query(units: 'ca').get() (err, res, body) ->
-    return msg.send 'Could not get weather forecast' if err
-    try
-      body = JSON.parse body
-      forecast = body.daily.data
-      today = forecast[0]
-      tomorrow = forecast[1]
-      dayAfter = forecast[2]
-    catch err
-      return msg.send 'Unable to parse forecast data.'
-    text = "The weather for:\n"
-
-    appendText = (text, data) ->
-      dateToday = new Date(data.time * 1000)
-      month = dateToday.getMonth() + 1
-      day = dateToday.getDate()
-      humidity = (data.humidity * 100).toFixed 0
-      maxTemp = getTemp data.temperatureMax
-      minTemp = getTemp data.temperatureMin
-
-      text += "#{month}/#{day} - High of #{maxTemp}, low of: #{minTemp} "
-      text += "#{data.summary} #{humidity}% humidity\n"
-      text
-
-    text = appendText text, today
-    text = appendText text, tomorrow
-    text = appendText text, dayAfter
-    msg.send text
-
-getTemp = (c) ->
-  if env.HUBOT_WEATHER_CELSIUS
-    return c.toFixed(0) + "ºC"
-  return ((c * 1.8) + 32).toFixed(0) + "ºF"
-
-
+#   kyleslattery
 module.exports = (robot) ->
+  robot.respond /weather ?(.+)?/i, (msg) ->
+    location = msg.match[1] || process.env.HUBOT_DARK_SKY_DEFAULT_LOCATION
+    return if not location
 
-  robot.respond /weather(?: me|for|in)?\s(.*)/i, (msg) ->
-    location = msg.match[1]
-    lookupAddress(msg, location, lookupWeather)
+    googleurl = "http://maps.googleapis.com/maps/api/geocode/json"
+    q = sensor: false, address: location
+    msg.http(googleurl)
+      .query(q)
+      .get() (err, res, body) ->
+        result = JSON.parse(body)
 
-  robot.respond /forecast(?: me|for|in)?\s(.*)/i, (msg) ->
-    location = msg.match[1]
-    lookupAddress(msg, location, lookupForecast)
+        if result.results.length > 0
+          lat = result.results[0].geometry.location.lat
+          lng = result.results[0].geometry.location.lng
+          darkSkyMe msg, lat,lng , (darkSkyText) ->
+            response = "Weather for #{result.results[0].formatted_address}\n#{darkSkyText}"
+            msg.send response
+        else
+          msg.send "Couldn't find #{location}"
+
+darkSkyMe = (msg, lat, lng, cb) ->
+  url = "https://api.forecast.io/forecast/#{process.env.HUBOT_DARK_SKY_API_KEY}/#{lat},#{lng}/"
+  if process.env.HUBOT_DARK_SKY_UNITS
+    url += "?units=#{process.env.HUBOT_DARK_SKY_UNITS}"
+  msg.http(url)
+    .get() (err, res, body) ->
+      result = JSON.parse(body)
+
+      if result.error
+        cb "#{result.error}"
+        return
+
+      response = "Currently: #{result.currently.summary} (#{result.currently.temperature}°)"
+      response += "\nToday: #{result.hourly.summary}"
+      response += "\nComing week: #{result.daily.summary}"
+      cb response
+      
