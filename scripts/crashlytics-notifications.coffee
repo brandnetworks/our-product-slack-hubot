@@ -30,6 +30,8 @@ module.exports = (robot) ->
     try
       data = req.body
 
+      console.log 'Entering Crashlytics crash hook with event: ' + data.event
+
       if data.event == 'verification'
         console.log "verified with Crashlytics"
 
