@@ -30,14 +30,18 @@ module.exports = (robot) ->
     try
       data = req.body
 
-      console.log 'Entering Crashlytics crash hook with event: ' + data.event
-
       if data.event == 'verification'
         console.log "verified with Crashlytics"
 
       if data.event == 'issue_impact_change'
-        console.log 'Got a crash from Crashlytics'
-        robot.messageRoom '#publishmobileautomati', 'Stuffs broke!'
+
+        issue = data.payload
+
+        if issue.impact_level == 1
+          robot.messageRoom '#publishmobileautomati', 'New issue in Crashlytics! See it at ' + issue.url
+        else
+          robot.messageRoom '#publishmobileautomati', 'Crashlytics issue ' + issue.display_id + ' upgraded to impact level' + issue.impact_level + '. Affects ' + issue.impacted_devices_count + ' users, ' + issue.crashes_count + ' times.'
+          
         res.writeHead 204, { 'Content-Length': 0}
 
       res.end()
