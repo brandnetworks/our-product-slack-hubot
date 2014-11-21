@@ -24,8 +24,8 @@ module.exports = (robot) ->
 
   robot.router.post "/hubot/crashlytics-notify", (req, res) ->
 
-    @failing ||= []
     query = querystring.parse(url.parse(req.url).query)
+    app = query.app || null
 
     try
       data = req.body
@@ -38,10 +38,10 @@ module.exports = (robot) ->
         issue = data.payload
 
         if issue.impact_level == 1
-          robot.messageRoom '#publishmobileautomati', 'New issue in Crashlytics! See it at ' + issue.url
+          robot.messageRoom '#publishmobileautomati', 'New Crashlytics issue in ' + app + '! See it at ' + issue.url
         else
-          robot.messageRoom '#publishmobileautomati', 'Crashlytics issue ' + issue.display_id + ' upgraded to impact level' + issue.impact_level + '. Affects ' + issue.impacted_devices_count + ' users, ' + issue.crashes_count + ' times.'
-          
+          robot.messageRoom '#publishmobileautomati', 'Crashlytics issue ' + issue.display_id + ' in ' + app + ' upgraded to impact level' + issue.impact_level + '. Affected ' + issue.impacted_devices_count + ' users ' + issue.crashes_count + ' times.'
+
         res.writeHead 204, { 'Content-Length': 0}
 
       res.end()
