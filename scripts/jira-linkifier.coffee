@@ -10,10 +10,15 @@
 # Commands:
 #   <mention a JIRA issue> - Get basic information about the issue
 #   hubot watch jira project <PROJECT> - Start watching for issues with the prefix PROJECT
+#   hubot stop watching <PROJECT> - stop watching a particular project
 #   hubot status on <issue> - Get detailed status on a jira issue
+#   hubot what projects are you watching? - get the list of jira projects that the bot is watching
 #
 # Author:
 #   bmnick
+
+Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
+
 module.exports = (robot) ->
   robot.respond /watch jira project ?(.+)?/i, (msg) ->
     projects = robot.brain.get('jira-projects') or []
@@ -22,6 +27,17 @@ module.exports = (robot) ->
 
     msg.send "Watching that project for you"
 
+  robot.respond /stop watching ?(.+)?/i, (msg) ->
+    projects = robot.brain.get('jira-projects') or []
+    projects.remove msg.match[1]
+    robot.brain.set 'jira-projects', projects
+
+    msg.send "Ignoring that project again"
+
   robot.respond /what projects are you watching\??/i, (msg) ->
     projects = robot.brain.get('jira-projects') or []
     msg.send "I'm watching: " + projects
+
+  robot.respond /status on ?(.+)?/i, (msg) ->
+    # unimplemented
+    msg.send "someday..."
