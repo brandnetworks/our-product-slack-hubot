@@ -18,6 +18,7 @@ module.exports = (robot) ->
   robot.respond /watch jira project ?(.+)?/i, (msg) ->
     projects = robot.brain.get('jira-projects') or []
     projects.push msg.match[1]
+    robot.brain.set 'jira-projects', projects
 
     msg.send "Watching that project for you"
 
