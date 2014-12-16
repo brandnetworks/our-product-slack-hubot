@@ -21,9 +21,14 @@ Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
 
 module.exports = (robot) ->
   robot.respond /watch jira project ?(.+)?/i, (msg) ->
+    shortcode = msg.match[1]
+
     projects = robot.brain.get('jira-projects') or []
-    projects.push msg.match[1]
+    projects.push shortcode
     robot.brain.set 'jira-projects', projects
+
+    robot.hear (new RegExp shortcode + "-([0-9]*)\s", "i"), (mention) ->
+      msg.send("Issue at: https://jira.brandnetworksinc.com/browse/" + shortcode + "-" + mention.match[1])
 
     msg.send "Watching that project for you"
 
@@ -40,4 +45,4 @@ module.exports = (robot) ->
 
   robot.respond /status on ?(.+)?/i, (msg) ->
     # unimplemented
-    msg.send "someday..."
+    msg.send "someday... email George about API credentials if you're impatient"
