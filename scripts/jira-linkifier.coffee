@@ -27,12 +27,10 @@ module.exports = (robot) ->
     projects.push shortcode
     robot.brain.set 'jira-projects', projects
 
-
+    robot.hear robot.hear /MOBILE-([0-9]*)/i, (mention) ->
+      mention.send("Issue at: https://jira.brandnetworksinc.com/browse/" + "MOBILE" + "-" + mention.match[1])
 
     msg.send "Watching that project for you"
-
-  robot.hear /MOBILE-([0-9]*)/i, (mention) ->
-    mention.send("Issue at: https://jira.brandnetworksinc.com/browse/" + "MOBILE" + "-" + mention.match[1])
 
   robot.respond /stop watching ?(.+)?/i, (msg) ->
     projects = robot.brain.get('jira-projects') or []
