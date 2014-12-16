@@ -32,7 +32,7 @@ module.exports = (robot) ->
     msg.send "Watching that project for you"
 
   robot.hear /MOBILE-([0-9]*)/i, (mention) ->
-    msg.send("Issue at: https://jira.brandnetworksinc.com/browse/" + "MOBILE" + "-" + mention.match[1])
+    mention.send("Issue at: https://jira.brandnetworksinc.com/browse/" + "MOBILE" + "-" + mention.match[1])
 
   robot.respond /stop watching ?(.+)?/i, (msg) ->
     projects = robot.brain.get('jira-projects') or []
