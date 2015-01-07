@@ -30,10 +30,13 @@ module.exports = (robot) ->
     robot.brain.set 'jira-projects', projects
 
     robot.hear new Regexp(shortcode + "-([0-9]*)", "i"), (mention) ->
+      console.log("Starting to check on " + shortcode + - mention.match[1])
       robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + shortcode + "-" + mention.match[1])
         .get( (err, req) ->
+          console.log("adding username and password to request")
           req.auth(process.env.HUBOT_JIRA_READER_USERNAME, process.env.HUBOT_JIRA_READER_PASSWORD)
         ) (err, res, body) ->
+          console.log("Recieved response from jira: " + body)
           issue = JSON.parse(body)
           mention.send(issue.key + ": " + issue.fields.summary + "(" + issue.fields.customfield_10300 + ")")
 
