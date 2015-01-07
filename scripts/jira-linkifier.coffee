@@ -6,6 +6,8 @@
 #
 # Configuration
 #   HUBOT_JIRA_INSTANCE_URL
+#   HUBOT_JIRA_READER_USERNAME
+#   HUBOT_JIRA_READER_PASSWORD
 #
 # Commands:
 #   <mention a JIRA issue> - Get basic information about the issue
@@ -28,7 +30,14 @@ module.exports = (robot) ->
     robot.brain.set 'jira-projects', projects
 
     robot.hear new Regexp(shortcode + "-([0-9]*)", "i"), (mention) ->
-      mention.send("Issue at: https://jira.brandnetworksinc.com/browse/" + shortcode + "-" + mention.match[1])
+      robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + shortcode + "-" + mention.match[1])
+        .get( (err, req) ->
+          req.auth(process.env.HUBOT_JIRA_READER_USERNAME, process.env.HUBOT_JIRA_READER_PASSWORD)
+        ) (err, res, body) ->
+          issue = JSON.parse(body)
+          mention.send(issue.key + ": " + issue.fields.summary + "(" + issue.fields.customfield_10300 + ")")
+
+      # mention.send("Issue at: https://jira.brandnetworksinc.com/browse/" + shortcode + "-" + mention.match[1])
 
     msg.send "Watching that project for you"
 
