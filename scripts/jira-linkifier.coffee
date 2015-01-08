@@ -60,8 +60,8 @@ module.exports = (robot) ->
 watch = (robot, project) ->
   robot.hear new RegExp(project + "-([0-9]*)", "i"), (mention) ->
     ticket_number = mention.match[1]
-    credentials
-    auth_header = 'Basic ' + new Buffer(process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD).toString('base64')
+    credentials = process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD
+    auth_header = 'Basic ' + new Buffer(credentials).toString('base64')
 
     robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + project + "-" + ticket_number)
       .header('Authorization', )
