@@ -50,7 +50,7 @@ module.exports = (robot) ->
     # unimplemented
     msg.send "someday... bug Ben about implementing this if you're impatient"
 
-  robot.on 'running' ->
+  robot.on 'running', =>
     console.log("Brain is loaded, rewatching projects...")
     projects = robot.brain.get('jira-projects') or []
     for project in projects
