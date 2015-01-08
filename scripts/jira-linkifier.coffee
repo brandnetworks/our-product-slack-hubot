@@ -36,6 +36,7 @@ module.exports = (robot) ->
       robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + shortcode + "-" + mention.match[1])
         .get( (err, req) ->
           console.log("adding username and password to request")
+          console.log("Auth keys are: " + Object.keys(req))
           req.auth(process.env.HUBOT_JIRA_READER_USERNAME, process.env.HUBOT_JIRA_READER_PASSWORD)
         ) (err, res, body) ->
           console.log("Recieved response from jira: " + body)
