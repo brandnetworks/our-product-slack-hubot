@@ -33,7 +33,8 @@ module.exports = (robot) ->
 
     robot.hear new RegExp(shortcode + "-([0-9]*)", "i"), (mention) ->
       console.log("Starting to check on " + shortcode + - mention.match[1])
-      robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + shortcode + "-" + mention.match[1], {'auth': process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD})
+      robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + shortcode + "-" + mention.match[1])
+        .header('Authorization', 'Basic ' + new Buffer(process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD).toString('base64'))
         .get() (err, res, body) ->
           console.log("Recieved response from jira: " + body)
           issue = JSON.parse(body)
