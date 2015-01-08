@@ -52,6 +52,7 @@ module.exports = (robot) ->
 
   projects = robot.brain.get('jira-projects') or []
   for project in projects
+    console.log("Watching project " + project + " after restart")
     watch(robot, project)
 
 watch = (robot, project) ->
