@@ -50,10 +50,12 @@ module.exports = (robot) ->
     # unimplemented
     msg.send "someday... bug Ben about implementing this if you're impatient"
 
-  projects = robot.brain.get('jira-projects') or []
-  for project in projects
-    console.log("Watching project " + project + " after restart")
-    watch(robot, project)
+  robot.on 'running' ->
+    console.log("Brain is loaded, rewatching projects...")
+    projects = robot.brain.get('jira-projects') or []
+    for project in projects
+      console.log("Watching project " + project + " after restart")
+      watch(robot, project)
 
 watch = (robot, project) ->
   robot.hear new RegExp(shortcode + "-([0-9]*)", "i"), (mention) ->
