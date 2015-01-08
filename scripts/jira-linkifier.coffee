@@ -31,7 +31,7 @@ module.exports = (robot) ->
     robot.brain.set 'jira-projects', projects
     console.log("Added project to memory")
 
-    robot.hear new Regexp(shortcode + "-([0-9]*)", "i"), (mention) ->
+    robot.hear new RegExp(shortcode + "-([0-9]*)", "i"), (mention) ->
       console.log("Starting to check on " + shortcode + - mention.match[1])
       robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + shortcode + "-" + mention.match[1])
         .get( (err, req) ->
