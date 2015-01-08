@@ -19,30 +19,20 @@
 # Author:
 #   bmnick
 
+# TODO: add support for multiple tickets in one message
+
 Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
 
 module.exports = (robot) ->
   robot.respond /watch jira project ?(.+)?/i, (msg) ->
-    console.log("Recieved request to watch project")
     shortcode = msg.match[1]
 
     projects = robot.brain.get('jira-projects') or []
     projects.push shortcode
     robot.brain.set 'jira-projects', projects
-    console.log("Added project to memory")
 
-    robot.hear new RegExp(shortcode + "-([0-9]*)", "i"), (mention) ->
-      console.log("Starting to check on " + shortcode + - mention.match[1])
-      robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + shortcode + "-" + mention.match[1])
-        .header('Authorization', 'Basic ' + new Buffer(process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD).toString('base64'))
-        .get() (err, res, body) ->
-          console.log("Recieved response from jira: " + body)
-          issue = JSON.parse(body)
-          mention.send(issue.key + ": " + issue.fields.summary + "(" + issue.fields.customfield_10300 + ")")
+    watch(robot, shortcode)
 
-      # mention.send("Issue at: https://jira.brandnetworksinc.com/browse/" + shortcode + "-" + mention.match[1])
-
-    console.log("Added watch for project")
     msg.send "Watching that project for you"
 
   robot.respond /stop watching ?(.+)?/i, (msg) ->
@@ -58,4 +48,20 @@ module.exports = (robot) ->
 
   robot.respond /status on ?(.+)?/i, (msg) ->
     # unimplemented
-    msg.send "someday... email George about API credentials if you're impatient"
+    msg.send "someday... bug Ben about implementing this if you're impatient"
+
+  projects = robot.brain.get('jira-projects') or []
+  for project in projects
+    watch(robot, project)
+
+watch = (robot, project) ->
+  robot.hear new RegExp(shortcode + "-([0-9]*)", "i"), (mention) ->
+    ticket_number = mention.match[1]
+    credentials
+    auth_header = 'Basic ' + new Buffer(process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD).toString('base64')
+
+    robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + project + "-" + ticket_number)
+      .header('Authorization', )
+      .get() (err, res, body) ->
+        issue = JSON.parse(body)
+        mention.send(issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.customfield_10300 + ")")
