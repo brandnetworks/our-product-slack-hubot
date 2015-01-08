@@ -23,11 +23,13 @@ Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
 
 module.exports = (robot) ->
   robot.respond /watch jira project ?(.+)?/i, (msg) ->
+    console.log("Recieved request to watch project")
     shortcode = msg.match[1]
 
     projects = robot.brain.get('jira-projects') or []
     projects.push shortcode
     robot.brain.set 'jira-projects', projects
+    console.log("Added project to memory")
 
     robot.hear new Regexp(shortcode + "-([0-9]*)", "i"), (mention) ->
       console.log("Starting to check on " + shortcode + - mention.match[1])
@@ -42,6 +44,7 @@ module.exports = (robot) ->
 
       # mention.send("Issue at: https://jira.brandnetworksinc.com/browse/" + shortcode + "-" + mention.match[1])
 
+    console.log("Added watch for project")
     msg.send "Watching that project for you"
 
   robot.respond /stop watching ?(.+)?/i, (msg) ->
