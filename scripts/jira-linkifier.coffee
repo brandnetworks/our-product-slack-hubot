@@ -10,7 +10,7 @@
 #   HUBOT_JIRA_READER_PASSWORD
 #
 # Commands:
-#   <mention a JIRA issue> - Get basic information about the issue
+#   <mention a JIRA issue> - Get basic information about the issue (must be watching the project first)
 #   hubot watch jira project <PROJECT> - Start watching for issues with the prefix PROJECT
 #   hubot stop watching <PROJECT> - stop watching a particular project
 #   hubot status on <issue> - Get detailed status on a jira issue
@@ -20,6 +20,7 @@
 #   bmnick
 
 # TODO: add support for multiple tickets in one message
+# TODO: add support for truly removing listeners
 
 Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
 
@@ -33,39 +34,47 @@ module.exports = (robot) ->
 
     watch(robot, shortcode)
 
-    msg.send "Watching that project for you"
+    msg.send "I'll let you know about issues from that project you mention"
 
   robot.respond /stop watching ?(.+)?/i, (msg) ->
     projects = robot.brain.get('jira-projects') or []
     projects.remove msg.match[1]
     robot.brain.set 'jira-projects', projects
 
-    msg.send "Ignoring that project again"
+    msg.send "Ignoring that project, it'll be reflected next time I reboot"
 
   robot.respond /what projects are you watching\??/i, (msg) ->
     projects = robot.brain.get('jira-projects') or []
-    msg.send "I'm watching: " + projects
+    msg.send "I'm watching: " + projects.join(", ")
 
   robot.respond /status on ?(.+)?/i, (msg) ->
     # unimplemented
     msg.send "someday... bug Ben about implementing this if you're impatient"
 
   robot.brain.on 'loaded', =>
-    console.log("Brain is loaded, rewatching projects...")
-    projects = robot.brain.get('jira-projects') or []
-    for project in projects
-      console.log("Watching project " + project + " after restart")
-      watch(robot, project)
+    if !has_started_watching_projects
+      has_started_watching_projects = true
+      console.log("Brain is loaded for the first time, rewatching projects...")
+      projects = robot.brain.get('jira-projects') or []
+      for project in projects
+        console.log("Watching project " + project + " after restart")
+        watch(robot, project)
+
+has_started_watching_projects = false
 
 watch = (robot, project) ->
   robot.hear new RegExp(project + "-([0-9]*)", "i"), (mention) ->
-    ticket_number = mention.match[1]
-    credentials = process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD
-    auth_header = 'Basic ' + new Buffer(credentials).toString('base64')
+    ticket = project + "-" + mention.match[1]
 
-    robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + project + "-" + ticket_number)
-      .header('Authorization', auth_header)
-      .get() (err, res, body) ->
-        issue = JSON.parse(body)
-        console.log("Got back issue: " + body)
-        mention.send(issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")")
+    load_issue robot, ticket, (issue) ->
+      mention.send(issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")")
+
+load_issue = (robot, issueNumber, completion) ->
+  credentials = process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD
+  auth_header = 'Basic ' + new Buffer(credentials).toString('base64')
+
+  robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + issueNumber)
+    .header('Authorization', auth_header)
+    .get() (err, res, body) ->
+      issue = JSON.parse(body)
+      completion(issue)
