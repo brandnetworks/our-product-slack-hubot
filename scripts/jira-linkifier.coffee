@@ -64,7 +64,7 @@ watch = (robot, project) ->
     auth_header = 'Basic ' + new Buffer(credentials).toString('base64')
 
     robot.http(process.env.HUBOT_JIRA_INSTANCE_URL + "/rest/api/2/issue/" + project + "-" + ticket_number)
-      .header('Authorization', )
+      .header('Authorization', auth_header)
       .get() (err, res, body) ->
         issue = JSON.parse(body)
         console.log("Got back issue: " + body)
