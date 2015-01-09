@@ -48,8 +48,8 @@ module.exports = (robot) ->
     msg.send "I'm watching: " + projects.join(", ")
 
   robot.respond /status on ?(.+)?/i, (msg) ->
-    # unimplemented
-    msg.send "someday... bug Ben about implementing this if you're impatient"
+    load_issue robot, msg.match[1], (issue) ->
+      msg.send issue_summary(issue)
 
   robot.brain.on 'loaded', =>
     if !has_started_watching_projects
@@ -67,7 +67,7 @@ watch = (robot, project) ->
     ticket = project + "-" + mention.match[1]
 
     load_issue robot, ticket, (issue) ->
-      mention.send(issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")")
+      mention.send issue_summary(issue)
 
 load_issue = (robot, issueNumber, completion) ->
   credentials = process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD
@@ -78,3 +78,6 @@ load_issue = (robot, issueNumber, completion) ->
     .get() (err, res, body) ->
       issue = JSON.parse(body)
       completion(issue)
+
+issue_summary = (issue) ->
+  issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")"
