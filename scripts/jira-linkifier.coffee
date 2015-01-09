@@ -49,7 +49,11 @@ module.exports = (robot) ->
 
   robot.respond /status on ?(.+)?/i, (msg) ->
     load_issue robot, msg.match[1], (issue) ->
-      msg.send issue_summary(issue)
+      text = issue_summary(issue)
+      if text?
+        msg.send text
+      else
+        msg.send "That ticket doesn't seem to exist..."
 
   robot.brain.on 'loaded', =>
     if !has_started_watching_projects
@@ -67,7 +71,8 @@ watch = (robot, project) ->
     ticket = project + "-" + mention.match[1]
 
     load_issue robot, ticket, (issue) ->
-      mention.send issue_summary(issue)
+      text = issue_summary issue
+      mention.send text if text?
 
 load_issue = (robot, issueNumber, completion) ->
   credentials = process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD
@@ -80,4 +85,7 @@ load_issue = (robot, issueNumber, completion) ->
       completion(issue)
 
 issue_summary = (issue) ->
-  issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")"
+  if issue.fields
+    issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")"
+  else
+    null
