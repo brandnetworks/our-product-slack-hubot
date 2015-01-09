@@ -67,4 +67,5 @@ watch = (robot, project) ->
       .header('Authorization', )
       .get() (err, res, body) ->
         issue = JSON.parse(body)
+        console.log("Got back issue: " + body)
         mention.send(issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.customfield_10300 + ")")
