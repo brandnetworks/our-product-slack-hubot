@@ -68,4 +68,4 @@ watch = (robot, project) ->
       .get() (err, res, body) ->
         issue = JSON.parse(body)
         console.log("Got back issue: " + body)
-        mention.send(issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.customfield_10300 + ")")
+        mention.send(issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")")
