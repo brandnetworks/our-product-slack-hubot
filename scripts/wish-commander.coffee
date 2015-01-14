@@ -37,4 +37,10 @@ imageMe = (msg, query, animated, faces, cb) ->
       if images?.length > 0
         image = msg.random images
         cb ensureImageExtension image.unescapedUrl
-        
+
+ensureImageExtension = (url) ->
+  ext = url.split('.').pop()
+  if /(png|jpe?g|gif)/i.test(ext)
+    url
+  else
+    "#{url}#.png"
