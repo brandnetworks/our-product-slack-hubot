@@ -17,7 +17,7 @@ url = require('url')
 querystring = require('querystring')
 
 module.exports = (robot) ->
-  robot.router.post "/hubot/xcode-publish-notify", (req, res) ->
+  robot.router.get "/hubot/xcode-publish-notify", (req, res) ->
     query = querystring.parse(url.parse(req.url).query)
     app = query.app || null
     success = query.success || false
