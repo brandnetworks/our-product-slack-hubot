@@ -20,7 +20,7 @@ module.exports = (robot) ->
   robot.router.get "/hubot/xcode-publish-notify", (req, res) ->
     query = querystring.parse(url.parse(req.url).query)
     app = query.app || null
-    success = query.success || false
+    success = query.success == "true" || false
     version = query.version || null
     number = query.number || null
     error = query.error || null
