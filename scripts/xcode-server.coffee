@@ -28,7 +28,7 @@ module.exports = (robot) ->
     if success
       robot.messageRoom '#publishmobileautomati', 'Built ' + app + ' ' + version + '-' + number + ' successfully. Currently available on Crashlytics for download.'
     else
-      robot.messageRoom '#publishmobileautomati', 'FAILED while building' + app + ' with error ' + error
+      robot.messageRoom '#publishmobileautomati', 'FAILED while building ' + app + ' with error ' + error
 
     res.writeHead 204, { 'Content-Length': 0}
 
