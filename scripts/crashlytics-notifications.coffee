@@ -38,9 +38,9 @@ module.exports = (robot) ->
         issue = data.payload
 
         if issue.impact_level == 1
-          robot.messageRoom '#publishmobileautomati', 'New Crashlytics issue in ' + app + '! See it at ' + issue.url
+          robot.messageRoom '#mobile-engineering', 'New Crashlytics issue in ' + app + '! See it at ' + issue.url
         else
-          robot.messageRoom '#publishmobileautomati', 'Crashlytics issue ' + issue.display_id + ' in ' + app + ' upgraded to impact level' + issue.impact_level + '. Affected ' + issue.impacted_devices_count + ' users ' + issue.crashes_count + ' times.'
+          robot.messageRoom '#mobile-engineering', 'Crashlytics issue ' + issue.display_id + ' in ' + app + ' upgraded to impact level' + issue.impact_level + '. Affected ' + issue.impacted_devices_count + ' users ' + issue.crashes_count + ' times.'
 
         res.writeHead 204, { 'Content-Length': 0}
 
