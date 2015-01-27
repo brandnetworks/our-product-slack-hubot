@@ -86,6 +86,6 @@ load_issue = (robot, issueNumber, completion) ->
 
 issue_summary = (issue) ->
   if issue.fields
-    process.env.HUBOT_JIRA_INSTANCE_URL + "/browse/" + issue.key + "|" + issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")"
+    process.env.HUBOT_JIRA_INSTANCE_URL + "/browse/" + issue.key + " | " + issue.key + ": " + issue.fields.summary + " (status: " + issue.fields.status.name + ")"
   else
     null
