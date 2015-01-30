@@ -34,6 +34,8 @@ The master branch needs to be kept clean, as any new commits on this branch will
 
 ### Useful documentation
 
-* [hubot]: http://hubot.github.com
-* [hubot-scripts][hubot-scripts]
+* [hubot's home](http://hubot.github.com)
+* [hubot-scripts](https://github.com/github/hubot-scripts/)
 * [Scripting Guide](https://github.com/github/hubot/blob/master/docs/scripting.md)
+* [Redis brain](https://github.com/hubot-scripts/hubot-redis-brain)
+* [Coffeescript](http://coffeescript.org)
