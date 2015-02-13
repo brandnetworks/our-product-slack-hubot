@@ -67,12 +67,11 @@ module.exports = (robot) ->
 has_started_watching_projects = false
 
 watch = (robot, project) ->
-  robot.hear new RegExp(project + "-([0-9]*)", "i"), (mention) ->
-    ticket = project + "-" + mention.match[1]
-
-    load_issue robot, ticket, (issue) ->
-      text = issue_summary issue
-      mention.send text if text?
+  robot.hear new RegExp(project + "-([0-9]*)", "gi"), (mention) ->
+    for ticket in mention.match
+      load_issue robot, ticket.toUpperCase(), (issue) ->
+        text = issue_summary issue
+        mention.send text if text?
 
 load_issue = (robot, issueNumber, completion) ->
   credentials = process.env.HUBOT_JIRA_READER_USERNAME + ":" + process.env.HUBOT_JIRA_READER_PASSWORD
