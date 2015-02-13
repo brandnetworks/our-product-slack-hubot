@@ -10,13 +10,13 @@ We have some custom scripts that provide useful functionality.
 
 ### Jira Linkifier
 
-This is a script that handles automatically linking and providing information on Jira issues that are mentioned in chats. In order to opt into this, simply say "<hubot> watch jira project <short code>", and it will begin chiming in whenever an issue from that project is mentioned. If you later want to opt out, "<hubot> stop watching <short code>" will let you do so.
+This is a script that handles automatically linking and providing information on Jira issues that are mentioned in chats. In order to opt into this, simply say "&lt;hubot&gt; watch jira project &lt;short code&gt;", and it will begin chiming in whenever an issue from that project is mentioned. If you later want to opt out, "&lt;hubot&gt; stop watching &lt;short code&gt;" will let you do so.
 
-This also provides a way to look up a specific ticket quickly, with "<hubot> status on <full issue number>". This does not require pre-registration of the project.
+This also provides a way to look up a specific ticket quickly, with "&lt;hubot&gt; status on &lt;full issue number&gt;". This does not require pre-registration of the project.
 
 ### Weather
 
-We can ask hubot about the weather, with "<hubot> weather [location]". If no location is provided, it defaults to our Rochester office.
+We can ask hubot about the weather, with "&lt;hubot&gt; weather [location]". If no location is provided, it defaults to our Rochester office.
 
 ### Crashlytics Notifications
 
@@ -34,6 +34,8 @@ The master branch needs to be kept clean, as any new commits on this branch will
 
 ### Useful documentation
 
-* [hubot]: http://hubot.github.com
-* [hubot-scripts][hubot-scripts]
+* [hubot's home](http://hubot.github.com)
+* [hubot-scripts](https://github.com/github/hubot-scripts/)
 * [Scripting Guide](https://github.com/github/hubot/blob/master/docs/scripting.md)
+* [Redis brain](https://github.com/hubot-scripts/hubot-redis-brain)
+* [Coffeescript](http://coffeescript.org)
